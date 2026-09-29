@@ -2,11 +2,11 @@ import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 
-export default async function EditProject({ params }: { params: { id: string } }): Promise<React.JSX.Element> {
+export default async function EditProject({ params }: { params: Promise<{ id: string }> }): Promise<React.JSX.Element> {
   const user = await getSessionUser();
   if (!user) redirect("/login");
-  const supabase = createServerSupabase();
-  const { data } = await supabase.from("projects").select("id,title,description,status").eq("id", params.id).single();
+  const supabase = await createServerSupabase();
+  const { data } = await supabase.from("projects").select("id,title,description,status").eq("id", (await params).id).single();
   if (!data) redirect("/dashboard/projects");
   if ((data.status as string) !== "pending") redirect("/dashboard/projects");
   return (

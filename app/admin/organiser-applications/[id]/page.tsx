@@ -2,9 +2,9 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { ApplicationReview } from "@/components/application-review";
 import { redirect } from "next/navigation";
 
-export default async function ApplicationDetail({ params }: { params: { id: string } }): Promise<React.JSX.Element> {
-  const supabase = createServerSupabase();
-  const { data } = await supabase.from("organiser_applications").select("*").eq("id", params.id).single();
+export default async function ApplicationDetail({ params }: { params: Promise<{ id: string }> }): Promise<React.JSX.Element> {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase.from("organiser_applications").select("*").eq("id", (await params).id).single();
   if (!data) redirect("/admin/organiser-applications");
   const a = data as { id: string; motivation: string; planned_challenge_title: string; planned_challenge_description: string; status: string };
   return (

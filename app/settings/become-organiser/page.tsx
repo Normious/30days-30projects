@@ -22,10 +22,10 @@ export default function BecomeOrganiser(): React.JSX.Element {
     setPending(false);
     if (!res.ok) toast.error(res.error); else { toast.success("Application submitted"); router.push("/settings/become-organiser/status"); }
   }
-  const input = "mt-1 w-full rounded-md border border-border bg-bg-subtle px-3 py-2";
+  const input = "w-full rounded-md border border-border bg-bg-subtle px-3 py-2 text-sm text-text placeholder:text-text-subtle transition-colors hover:border-border-strong focus:border-brand-500 focus:outline-none";
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="text-3xl font-semibold">Become an organiser</h1>
+    <div className="mx-auto max-w-2xl px-4 py-10 md:py-14">
+      <h1 className="text-3xl font-semibold tracking-tight">Become an organiser</h1>
       <p className="mt-2 text-sm text-text-muted">Accounts must be 7+ days old. One pending application at a time.</p>
       <form onSubmit={submit} className="mt-6 space-y-4">
         <div><label htmlFor="motivation" className="block text-sm">Motivation (100–2000 chars)</label><textarea id="motivation" name="motivation" required minLength={100} maxLength={2000} className={input} /></div>
@@ -39,7 +39,7 @@ export default function BecomeOrganiser(): React.JSX.Element {
         <div><label htmlFor="portfolio_url" className="block text-sm">Portfolio URL</label><input id="portfolio_url" name="portfolio_url" type="url" className={input} /></div>
         <div><label htmlFor="linkedin_url" className="block text-sm">LinkedIn URL</label><input id="linkedin_url" name="linkedin_url" type="url" className={input} /></div>
         <div><label htmlFor="community_references" className="block text-sm">Community references</label><textarea id="community_references" name="community_references" maxLength={500} className={input} /></div>
-        <button disabled={pending} className="w-full rounded-md bg-brand-600 px-4 py-2 text-white disabled:opacity-50">Submit application</button>
+        <button disabled={pending} className="w-full rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 ease-out hover:bg-brand-700 active:translate-y-[1px] disabled:opacity-50">Submit application</button>
       </form>
     </div>
   );

@@ -11,7 +11,7 @@ import { uniqueSlug } from "@/lib/slug";
 export type ActionResult<T = { id: string }> = { ok: true; data: T } | { ok: false; error: string };
 
 async function logAudit(actorId: string, action: string, targetType: string, targetId?: string): Promise<void> {
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   await supabase.from("audit_log").insert({ actor_id: actorId, action, target_type: targetType, target_id: targetId ?? null });
 }
 
@@ -24,9 +24,9 @@ export async function createProject(input: z.infer<typeof projectSchema>, coAuth
   const parsed = projectSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.errors[0]?.message ?? "Invalid input" };
 
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: existing } = await supabase.from("projects").select("slug");
-  const taken = new Set((existing ?? []).map((p) => p.slug as string));
+  const taken: Set<string> = new Set(((existing ?? []) as { slug: string }[]).map((p) => p.slug));
   const slug = uniqueSlug(parsed.data.title, taken);
 
   const { data: project, error } = await supabase.from("projects").insert({
@@ -54,7 +54,7 @@ export async function createProject(input: z.infer<typeof projectSchema>, coAuth
 export async function updateProject(id: string, input: Partial<z.infer<typeof projectSchema>>): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: own } = await supabase.from("project_authors").select("id").eq("project_id", id).eq("user_id", user.id).eq("role", "author").limit(1);
   if (!own?.length && user.role !== "admin") return { ok: false, error: "Not authorized" };
   const { error } = await supabase.from("projects").update({
@@ -72,7 +72,7 @@ export async function updateProject(id: string, input: Partial<z.infer<typeof pr
 export async function deleteProject(id: string): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   if (user.role !== "admin") {
     const { data: own } = await supabase.from("project_authors").select("id").eq("project_id", id).eq("user_id", user.id).limit(1);
     if (!own?.length) return { ok: false, error: "Not authorized" };
@@ -86,7 +86,7 @@ export async function deleteProject(id: string): Promise<ActionResult> {
 
 /** Public atomic view-count increment. */
 export async function incrementViewCount(id: string): Promise<void> {
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   await supabase.rpc("increment_project_views", { project_id: id }).then(
     undefined,
     async () => {

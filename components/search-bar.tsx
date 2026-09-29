@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { Search } from "lucide-react";
+import { fieldCls } from "./ui";
 
 export function SearchBar({ defaultValue }: { defaultValue: string }): React.JSX.Element {
   const router = useRouter();
@@ -18,7 +20,10 @@ export function SearchBar({ defaultValue }: { defaultValue: string }): React.JSX
       }}
     >
       <label htmlFor="discover-search" className="sr-only">Search projects</label>
-      <input id="discover-search" name="q" defaultValue={defaultValue} placeholder="Search projects…" className="w-full rounded-md border border-border bg-bg-subtle px-3 py-2 text-sm" />
+      <div className="relative">
+        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" aria-hidden />
+        <input id="discover-search" name="q" defaultValue={defaultValue} placeholder="Search projects…" autoComplete="off" className={`${fieldCls} pl-9`} />
+      </div>
     </form>
   );
 }

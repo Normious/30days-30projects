@@ -1,9 +1,9 @@
 import { createServerSupabase } from "@/lib/supabase/server";
 import { ModerationQueue } from "@/components/moderation-queue";
 
-export default async function AdminProjects({ searchParams }: { searchParams: { status?: string } }): Promise<React.JSX.Element> {
-  const supabase = createServerSupabase();
-  const status = searchParams.status ?? "pending";
+export default async function AdminProjects({ searchParams }: { searchParams: Promise<{ status?: string }> }): Promise<React.JSX.Element> {
+  const supabase = await createServerSupabase();
+  const status = (await searchParams).status ?? "pending";
   const { data } = await supabase.from("projects").select("id,title,description,slug").eq("status", status).limit(100);
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">

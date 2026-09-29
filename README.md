@@ -2,6 +2,8 @@
 
 An open-source multi-challenge portfolio and submission platform. Participants join challenges, submit projects, and get a permanent portfolio page at `/u/:username`. Organisers run challenges; admins moderate.
 
+Stack: Next.js 16 + React 19 + TypeScript + Tailwind + Supabase (see `docs/DECISIONS.md` #10 for the v14→v16 upgrade record).
+
 ## Deploy in 5 min (you push to cloud)
 
 ```bash
@@ -28,4 +30,4 @@ Cloud push (your step):
 | `pnpm create-admin` | Promote user via `ADMIN_EMAIL` |
 | `pnpm seed` | Bulk import seed JSON |
 
-Spec: `SPEC.md` (v1, frozen). Plan: `docs/IMPLEMENTATION_PLAN.md`. Decisions: `docs/DECISIONS.md`.
+Spec: `docs/SPEC.md` (v1, frozen). Plan: `docs/IMPLEMENTATION_PLAN.md`. Decisions: `docs/DECISIONS.md`.

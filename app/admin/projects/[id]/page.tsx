@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { featureProject, approveProject, rejectProject } from "@/actions/moderation";
 
-export default async function AdminProjectDetail({ params }: { params: { id: string } }): Promise<React.JSX.Element> {
-  const supabase = createServerSupabase();
-  const { data } = await supabase.from("projects").select("id,slug,title,description,status,featured").eq("id", params.id).single();
+export default async function AdminProjectDetail({ params }: { params: Promise<{ id: string }> }): Promise<React.JSX.Element> {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase.from("projects").select("id,slug,title,description,status,featured").eq("id", (await params).id).single();
   if (!data) redirect("/admin/projects");
   const p = data as { id: string; title: string; status: string; featured: boolean };
   void featureProject; void approveProject; void rejectProject;
