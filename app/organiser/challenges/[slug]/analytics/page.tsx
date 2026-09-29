@@ -1,0 +1,22 @@
+import { createServerSupabase } from "@/lib/supabase/server";
+
+export default async function Analytics({ params }: { params: { slug: string } }): Promise<React.JSX.Element> {
+  const supabase = createServerSupabase();
+  const { data: challenge } = await supabase.from("challenges").select("id,title").eq("slug", params.slug).single();
+  const c = challenge as { id: string; title: string } | null;
+  const [{ count: total }, { count: approved }, { count: pending }, { count: participants }] = c ? await Promise.all([
+    supabase.from("projects").select("id", { count: "exact", head: true }).eq("challenge_id", c.id),
+    supabase.from("projects").select("id", { count: "exact", head: true }).eq("challenge_id", c.id).eq("status", "approved"),
+    supabase.from("projects").select("id", { count: "exact", head: true }).eq("challenge_id", c.id).eq("status", "pending"),
+    supabase.from("challenge_participants").select("id", { count: "exact", head: true }).eq("challenge_id", c.id).eq("role", "participant"),
+  ]) : [{ count: 0 }, { count: 0 }, { count: 0 }, { count: 0 }];
+  const cards: [string, number | null][] = [["Total projects", total], ["Approved", approved], ["Pending", pending], ["Participants", participants]];
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <h1 className="text-3xl font-semibold">Analytics — {c?.title ?? params.slug}</h1>
+      <div className="mt-6 grid gap-4 sm:grid-cols-4">
+        {cards.map(([label, v]) => <div key={label} className="rounded-md border border-border p-5"><p className="font-mono text-2xl">{v ?? 0}</p><p className="text-sm text-text-muted">{label}</p></div>)}
+      </div>
+    </div>
+  );
+}
