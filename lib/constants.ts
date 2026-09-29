@@ -14,3 +14,7 @@ export const RESERVED_USERNAMES = [
 
 export const MAX_FEATURED_PROJECTS = 5;
 export const MAX_CO_ORGANISERS = 5;
+
+// ponytail: OAuth buttons hidden until Google/GitHub providers are configured
+// in Supabase. Flip to true — no other change needed, the logic stays wired.
+export const OAUTH_ENABLED = false;
