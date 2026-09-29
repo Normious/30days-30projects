@@ -21,7 +21,7 @@ export type SeedFile = {
 export async function bulkImport(seed: SeedFile, autoApprove = false): Promise<{ ok: boolean; users: number; projects: number; error?: string }> {
   const user = await getSessionUser();
   if (!user || user.role !== "admin") return { ok: false, users: 0, projects: 0, error: "Admin only" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
 
   const { data: challenge, error: chErr } = await supabase.from("challenges").upsert({
     slug: seed.challenge.slug, title: seed.challenge.title, tagline: seed.challenge.tagline ?? null,
@@ -34,7 +34,7 @@ export async function bulkImport(seed: SeedFile, autoApprove = false): Promise<{
   const challengeId = (challenge as { id: string }).id;
 
   const { data: existingProjects } = await supabase.from("projects").select("slug");
-  const taken = new Set((existingProjects ?? []).map((p) => p.slug as string));
+  const taken: Set<string> = new Set(((existingProjects ?? []) as { slug: string }[]).map((p) => p.slug));
   let projectCount = 0;
 
   for (const p of seed.participants) {
@@ -79,7 +79,7 @@ export async function bulkImport(seed: SeedFile, autoApprove = false): Promise<{
 export async function inviteParticipants(challengeId: string, emails: string[]): Promise<{ ok: boolean; invited: number; error?: string }> {
   const user = await getSessionUser();
   if (!user || (user.role !== "organiser" && user.role !== "admin")) return { ok: false, invited: 0, error: "Organiser only" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   let invited = 0;
   for (const email of emails) {
     const token = randomBytes(32).toString("hex");

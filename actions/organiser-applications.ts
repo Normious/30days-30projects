@@ -17,7 +17,7 @@ export async function applyForOrganiser(input: unknown): Promise<ActionResult> {
   const parsed = organiserApplicationSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.errors[0]?.message ?? "Invalid input" };
   if (new Date(parsed.data.planned_start_date) < new Date(new Date().toDateString())) return { ok: false, error: "Planned dates must be in the future" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data, error } = await supabase.from("organiser_applications").insert({ applicant_id: user.id, ...parsed.data }).select("id").single();
   if (error) return { ok: false, error: error.message };
   revalidatePath("/settings/become-organiser/status");
@@ -28,7 +28,7 @@ export async function applyForOrganiser(input: unknown): Promise<ActionResult> {
 export async function withdrawApplication(id: string): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { error } = await supabase.from("organiser_applications").update({ status: "withdrawn" }).eq("id", id).eq("applicant_id", user.id).eq("status", "pending");
   if (error) return { ok: false, error: error.message };
   revalidatePath("/settings/become-organiser/status");
@@ -39,7 +39,7 @@ export async function withdrawApplication(id: string): Promise<ActionResult> {
 export async function approveApplication(id: string): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user || user.role !== "admin") return { ok: false, error: "Admin only" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: app } = await supabase.from("organiser_applications").select("applicant_id").eq("id", id).single();
   if (!app) return { ok: false, error: "Not found" };
   await supabase.from("organiser_applications").update({ status: "approved", reviewed_by: user.id, reviewed_at: new Date().toISOString() }).eq("id", id);
@@ -54,7 +54,7 @@ export async function rejectApplication(id: string, reason: string): Promise<Act
   const user = await getSessionUser();
   if (!user || user.role !== "admin") return { ok: false, error: "Admin only" };
   if (reason.length < 20 || reason.length > 500) return { ok: false, error: "Reason must be 20–500 chars" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { error } = await supabase.from("organiser_applications").update({ status: "rejected", rejection_reason: reason, reviewed_by: user.id, reviewed_at: new Date().toISOString() }).eq("id", id);
   if (error) return { ok: false, error: error.message };
   await supabase.from("audit_log").insert({ actor_id: user.id, action: "organiser_application.reject", target_type: "organiser_application", target_id: id });

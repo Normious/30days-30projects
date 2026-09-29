@@ -1,9 +1,9 @@
-# Implementation Plan (from SPEC v1, frozen)
+# Implementation Plan (from SPEC v1, frozen — framework amended to Next 16 per owner, see DECISIONS #10)
 
-Source: `SPEC.md` (v1). Order respects dependencies: migrations → backend → frontend → tests → docs → deploy.
+Source: `SPEC.md` (v1; database/auth contract unchanged). Order respects dependencies: migrations → backend → frontend → tests → docs → deploy.
 
 ## 0. Scaffold
-- [x] package.json (Next 14, Supabase, Zod, shadcn deps), tsconfig strict + noUncheckedIndexedAccess, tailwind tokens §8.3, globals.css, layout/Nav/Footer
+- [x] package.json (Next 16 + React 19, Supabase, Zod, shadcn deps), tsconfig strict + noUncheckedIndexedAccess, tailwind tokens §8.3, globals.css, layout/Nav/Footer
 
 ## 1. Migrations (`supabase/migrations/`)
 - [x] 0001 extensions (§10.1) · 0002 enums (§10.2) · 0003 core tables (profiles, challenges, challenge_participants, projects, project_authors) · 0004 organiser tables (organiser_applications, histories, invites, audit_log, likes) · 0005 triggers (7, §10.4) · 0006 RLS (8 helpers + all policies §11) · 0007 storage (screenshots, avatars §11.3)

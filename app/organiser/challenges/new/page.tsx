@@ -16,10 +16,11 @@ export default function NewChallenge(): React.JSX.Element {
     setPending(false);
     if (!res.ok) toast.error(res.error); else { toast.success("Draft created"); router.push("/organiser/challenges"); }
   }
-  const input = "mt-1 w-full rounded-md border border-border bg-bg-subtle px-3 py-2";
+  const input = "w-full rounded-md border border-border bg-bg-subtle px-3 py-2 text-sm text-text placeholder:text-text-subtle transition-colors hover:border-border-strong focus:border-brand-500 focus:outline-none";
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="text-3xl font-semibold">Create challenge</h1>
+    <div className="mx-auto max-w-2xl px-4 py-10 md:py-14">
+      <h1 className="text-3xl font-semibold tracking-tight">Create challenge</h1>
+      <p className="mt-2 text-sm text-text-muted">Saved as a draft — publish when ready.</p>
       <form onSubmit={submit} className="mt-6 space-y-4">
         <div><label htmlFor="title" className="block text-sm">Title</label><input id="title" name="title" required className={input} /></div>
         <div><label htmlFor="tagline" className="block text-sm">Tagline</label><input id="tagline" name="tagline" maxLength={200} className={input} /></div>
@@ -29,7 +30,7 @@ export default function NewChallenge(): React.JSX.Element {
           <div><label htmlFor="end_date" className="block text-sm">End</label><input id="end_date" name="end_date" type="date" required className={input} /></div>
         </div>
         <div><label htmlFor="registration_mode" className="block text-sm">Registration</label><select id="registration_mode" name="registration_mode" className={input}><option value="public">Public</option><option value="invite_only">Invite only</option></select></div>
-        <button disabled={pending} className="w-full rounded-md bg-brand-600 px-4 py-2 text-white disabled:opacity-50">Save as draft</button>
+        <button disabled={pending} className="w-full rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-all duration-150 ease-out hover:bg-brand-700 active:translate-y-[1px] disabled:opacity-50">Save as draft</button>
       </form>
     </div>
   );

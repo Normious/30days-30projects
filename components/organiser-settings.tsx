@@ -8,9 +8,9 @@ export function OrganiserSettings({ challengeId, organisers, isPrimary }: { chal
   const [email, setEmail] = useState("");
   return (
     <div className="space-y-4">
-      <ul className="space-y-2">
+      <ul className="divide-y divide-border rounded-md border border-border">
         {organisers.map((o) => (
-          <li key={o.user_id} className="flex items-center justify-between rounded-md border border-border px-4 py-3">
+          <li key={o.user_id} className="flex flex-col gap-2 px-4 py-3 transition-colors hover:bg-bg-subtle sm:flex-row sm:items-center sm:justify-between">
             <span>{o.username} {o.is_primary && <span className="font-mono text-xs text-brand-500">primary</span>}</span>
             {isPrimary && !o.is_primary && (
               <span className="flex gap-2 text-sm">

@@ -11,3 +11,4 @@
 | 7 | Markdown via remark + rehype-sanitize (not raw HTML) | SPEC §20 XSS mitigation. |
 | 8 | No new npm packages beyond spec stack | Remark parse/gfm/rehype packages justified here for §20 sanitization requirement. |
 | 9 | `projects.search_vector` via trigger, not GENERATED column | Spec §10.3 expression uses `array_to_string`, which is STABLE (not IMMUTABLE) on PG16 — Postgres rejects it in GENERATED columns. Trigger computes the identical value; same column name, same GIN index. |
+| 10 | Upgraded framework: Next.js 14 → 16 + React 18 → 19 (SPEC §7 amended by owner) | Owner directive 2026-09-29. Changes applied: async `cookies()`/`params`/`searchParams` throughout, `middleware.ts` → `proxy.ts` (Node runtime), `next lint` → ESLint 9 flat config (`eslint.config.mjs` + `@next/eslint-plugin-next`), React 19 peer bumps, `@supabase/ssr` 0.4 → 0.7. SPEC §10–11 (database) untouched. `docs/SPEC.md` stays v1-frozen; this row is the amendment record. |

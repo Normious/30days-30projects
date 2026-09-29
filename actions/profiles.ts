@@ -12,7 +12,7 @@ export async function updateProfile(input: unknown): Promise<ActionResult> {
   if (!user) return { ok: false, error: "Not authenticated" };
   const parsed = profileSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.errors[0]?.message ?? "Invalid input" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { error } = await supabase.from("profiles").update(parsed.data).eq("id", user.id);
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/u/`);

@@ -9,7 +9,7 @@ import type { ActionResult } from "./projects";
 async function requireModerator(challengeId: string | null, userId: string, role: string): Promise<boolean> {
   if (role === "admin") return true;
   if (!challengeId) return false;
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data } = await supabase.from("challenge_participants").select("id")
     .eq("challenge_id", challengeId).eq("user_id", userId).eq("role", "organiser").limit(1);
   return (data?.length ?? 0) > 0;
@@ -19,7 +19,7 @@ async function requireModerator(challengeId: string | null, userId: string, role
 export async function approveProject(id: string): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: project } = await supabase.from("projects").select("challenge_id").eq("id", id).single();
   if (!project) return { ok: false, error: "Not found" };
   if (!(await requireModerator(project.challenge_id as string | null, user.id, user.role)))
@@ -36,7 +36,7 @@ export async function rejectProject(id: string, reason: string): Promise<ActionR
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
   if (reason.length < 5 || reason.length > 500) return { ok: false, error: "Reason must be 5–500 chars" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: project } = await supabase.from("projects").select("challenge_id").eq("id", id).single();
   if (!project) return { ok: false, error: "Not found" };
   if (!(await requireModerator(project.challenge_id as string | null, user.id, user.role)))
@@ -52,7 +52,7 @@ export async function rejectProject(id: string, reason: string): Promise<ActionR
 export async function featureProject(id: string, featured: boolean): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user || user.role !== "admin") return { ok: false, error: "Admin only" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   if (featured) {
     const { count } = await supabase.from("projects").select("id", { count: "exact", head: true }).eq("featured", true);
     if ((count ?? 0) >= MAX_FEATURED_PROJECTS) return { ok: false, error: `Max ${MAX_FEATURED_PROJECTS} featured projects` };
@@ -67,7 +67,7 @@ export async function featureProject(id: string, featured: boolean): Promise<Act
 export async function bulkApprove(ids: string[]): Promise<{ ok: boolean; approved: number; error?: string }> {
   const user = await getSessionUser();
   if (!user || user.role !== "admin") return { ok: false, approved: 0, error: "Admin only" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { error, count } = await supabase.from("projects").update({ status: "approved" }).in("id", ids);
   if (error) return { ok: false, approved: 0, error: error.message };
   await supabase.from("audit_log").insert({ actor_id: user.id, action: "project.bulk_approve", target_type: "project", metadata: { count: ids.length } });

@@ -14,9 +14,9 @@ export async function createChallenge(input: unknown): Promise<ActionResult> {
   const parsed = challengeSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.errors[0]?.message ?? "Invalid input" };
   if (new Date(parsed.data.end_date) < new Date(parsed.data.start_date)) return { ok: false, error: "end_date >= start_date" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: existing } = await supabase.from("challenges").select("slug");
-  const slug = uniqueSlug(parsed.data.title, new Set((existing ?? []).map((c) => c.slug as string)));
+  const slug = uniqueSlug(parsed.data.title, new Set<string>(((existing ?? []) as { slug: string }[]).map((c) => c.slug)));
   const { data, error } = await supabase.from("challenges").insert({
     slug, title: parsed.data.title, tagline: parsed.data.tagline ?? null,
     description: parsed.data.description ?? null, rules: parsed.data.rules ?? null,
@@ -35,7 +35,7 @@ export async function createChallenge(input: unknown): Promise<ActionResult> {
 export async function updateChallenge(id: string, input: unknown): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: ch } = await supabase.from("challenges").select("primary_organiser_id").eq("id", id).single();
   if (!ch || (ch.primary_organiser_id !== user.id && user.role !== "admin")) return { ok: false, error: "Not authorized" };
   const parsed = challengeSchema.partial().safeParse(input);
@@ -50,7 +50,7 @@ export async function updateChallenge(id: string, input: unknown): Promise<Actio
 export async function publishChallenge(id: string): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: ch } = await supabase.from("challenges").select("primary_organiser_id,status").eq("id", id).single();
   if (!ch || (ch.primary_organiser_id !== user.id && user.role !== "admin")) return { ok: false, error: "Not authorized" };
   if (ch.status !== "draft") return { ok: false, error: "Only drafts can be published" };
@@ -64,7 +64,7 @@ export async function publishChallenge(id: string): Promise<ActionResult> {
 export async function archiveChallenge(id: string): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: ch } = await supabase.from("challenges").select("primary_organiser_id").eq("id", id).single();
   if (!ch || (ch.primary_organiser_id !== user.id && user.role !== "admin")) return { ok: false, error: "Not authorized" };
   const { error } = await supabase.from("challenges").update({ status: "archived" }).eq("id", id);
@@ -77,7 +77,7 @@ export async function archiveChallenge(id: string): Promise<ActionResult> {
 export async function deleteChallenge(id: string): Promise<ActionResult> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "Not authenticated" };
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: ch } = await supabase.from("challenges").select("primary_organiser_id").eq("id", id).single();
   if (!ch || (ch.primary_organiser_id !== user.id && user.role !== "admin")) return { ok: false, error: "Not authorized" };
   await supabase.from("projects").update({ challenge_id: null }).eq("challenge_id", id);
