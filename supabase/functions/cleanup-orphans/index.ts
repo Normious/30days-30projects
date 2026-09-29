@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-serve(async (_req: Request): Promise<Response> => {
+serve(async (): Promise<Response> => {
   const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
   // Expired unused invites
   const { data: expired } = await supabase.from("challenge_invites").select("id").lt("expires_at", new Date().toISOString()).is("used_at", null);
