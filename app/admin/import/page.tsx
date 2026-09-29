@@ -23,8 +23,8 @@ export default function ImportPage(): React.JSX.Element {
     setPending(false);
   }
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-semibold">Bulk import</h1>
+    <div className="mx-auto max-w-3xl px-4 py-10 md:py-14">
+      <h1 className="text-3xl font-semibold tracking-tight">Bulk import</h1>
       <p className="mt-2 text-sm text-text-muted">Upload seed JSON (SPEC §14). Preview counts before confirm — the file is parsed client-side and you confirm by choosing the file.</p>
       <label className="mt-6 flex items-center gap-2 text-sm"><input type="checkbox" checked={autoApprove} onChange={(e) => setAutoApprove(e.target.checked)} /> Auto-approve (pre-vetted cohorts only)</label>
       <label htmlFor="seed-file" className="mt-3 block text-sm">Seed JSON file</label>

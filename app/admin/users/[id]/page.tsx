@@ -8,8 +8,8 @@ export default async function UserDetail({ params }: { params: Promise<{ id: str
   if (!user) redirect("/admin/users");
   const u = user as { id: string; username: string; display_name: string; platform_role: "user" | "participant" | "organiser" | "admin" };
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-semibold">{u.display_name}</h1>
+    <div className="mx-auto max-w-3xl px-4 py-10 md:py-14">
+      <h1 className="text-3xl font-semibold tracking-tight">{u.display_name}</h1>
       <p className="font-mono text-sm text-text-subtle">@{u.username} · {u.platform_role}</p>
       <div className="mt-6"><RoleChangeDialog userId={u.id} currentRole={u.platform_role} /></div>
     </div>

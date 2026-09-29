@@ -63,7 +63,7 @@ export default async function Home(): Promise<React.JSX.Element> {
 
       {/* Tech strip — single marquee, motion-safe */}
       <div className="overflow-hidden border-y border-border py-3" aria-hidden>
-        <div className="flex w-max gap-8 font-mono text-xs uppercase tracking-widest text-text-subtle motion-safe:animate-[marquee_30s_linear_infinite]">
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 px-4 font-mono text-xs uppercase tracking-widest text-text-subtle motion-safe:w-max motion-safe:flex-nowrap motion-safe:justify-start motion-safe:gap-8 motion-safe:px-0 motion-safe:animate-[marquee_30s_linear_infinite]">
           {[...TECH, ...TECH].map((t, i) => <span key={i}>{t}</span>)}
         </div>
       </div>
