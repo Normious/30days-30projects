@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -22,30 +22,51 @@ export default function Login(): React.JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
+  const [magicPending, setMagicPending] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
   const [error, setError] = useState("");
+  const signInLock = useRef(false);
+  const magicLock = useRef(false);
 
   async function submitPassword(e: React.FormEvent): Promise<void> {
     e.preventDefault();
+    if (signInLock.current) return;
+    signInLock.current = true;
     setError("");
     setPending(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setPending(false);
-    if (error) {
-      setError(error.message);
-      return;
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      router.push(await landingFor(supabase));
+      router.refresh();
+    } catch {
+      setError("Couldn't sign you in. Check your connection and try again.");
+    } finally {
+      signInLock.current = false;
+      setPending(false);
     }
-    router.push(await landingFor(supabase));
-    router.refresh();
   }
 
   async function sendMagicLink(): Promise<void> {
+    if (magicLock.current) return;
+    magicLock.current = true;
     setError("");
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/auth/callback` } });
-    if (error) setError(error.message);
-    else setLinkSent(true);
+    setMagicPending(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/auth/callback` } });
+      if (error) setError(error.message);
+      else setLinkSent(true);
+    } catch {
+      setError("Couldn't send a magic link. Check your connection and try again.");
+    } finally {
+      magicLock.current = false;
+      setMagicPending(false);
+    }
   }
 
   async function oauth(provider: "google" | "github"): Promise<void> {
@@ -85,8 +106,8 @@ export default function Login(): React.JSX.Element {
       {linkSent ? (
         <p className="rounded-md border border-border bg-bg-subtle p-4 text-sm">Check your email for a magic link.</p>
       ) : (
-        <button onClick={sendMagicLink} disabled={!email} className="w-full rounded-md border border-border px-4 py-2 text-sm transition-colors hover:border-border-strong active:translate-y-[1px] disabled:opacity-50">
-          Email me a magic link instead
+        <button onClick={sendMagicLink} disabled={!email || magicPending} className="w-full rounded-md border border-border px-4 py-2 text-sm transition-colors hover:border-border-strong active:translate-y-[1px] disabled:opacity-50">
+          {magicPending ? "Sending…" : "Email me a magic link instead"}
         </button>
       )}
 

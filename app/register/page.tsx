@@ -1,20 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { signUpWithPassword } from "@/actions/auth";
+import { passwordChecks } from "@/lib/password";
 import { fieldCls } from "@/components/ui";
 import { clsx } from "clsx";
-
-function passwordChecks(pw: string): { label: string; ok: boolean }[] {
-  return [
-    { label: "8+ characters", ok: pw.length >= 8 },
-    { label: "Upper & lower case", ok: /[a-z]/.test(pw) && /[A-Z]/.test(pw) },
-    { label: "A number", ok: /\d/.test(pw) },
-    { label: "A symbol", ok: /[^A-Za-z0-9]/.test(pw) },
-  ];
-}
 
 function strengthLabel(passed: number): { text: string; cls: string } {
   if (passed >= 4) return { text: "Strong", cls: "text-accent-emerald" };
@@ -30,6 +23,7 @@ export default function Register(): React.JSX.Element {
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const submitLock = useRef(false);
   const checks = passwordChecks(password);
   const passed = checks.filter((c) => c.ok).length;
   const strong = passed >= 4;
@@ -37,25 +31,31 @@ export default function Register(): React.JSX.Element {
 
   async function submit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
+    if (submitLock.current) return;
+    submitLock.current = true;
     setError("");
     setPending(true);
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    });
-    setPending(false);
-    if (error) {
-      setError(error.message);
-      return;
-    }
-    if (data.session) {
-      const { data: profile } = await supabase.from("profiles").select("bio").eq("id", data.session.user.id).single();
-      router.push((profile as { bio: string | null } | null)?.bio ? "/dashboard" : "/settings/profile");
-      router.refresh();
-    } else {
-      setSent(true);
+    try {
+      const res = await signUpWithPassword({ email, password });
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      if (res.hasSession && res.userId) {
+        const supabase = createClient();
+        const { data: profile } = await supabase.from("profiles").select("bio").eq("id", res.userId).single();
+        router.push((profile as { bio: string | null } | null)?.bio ? "/dashboard" : "/settings/profile");
+        router.refresh();
+      } else if (res.hasSession) {
+        setError("Your account was created, but we couldn't load your profile. Please sign in to continue.");
+      } else {
+        setSent(true);
+      }
+    } catch {
+      setError("Couldn't create your account. Check your connection and try again.");
+    } finally {
+      submitLock.current = false;
+      setPending(false);
     }
   }
 
