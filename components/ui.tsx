@@ -3,7 +3,7 @@ import { clsx } from "clsx";
 
 /** Shared control styles — single source for inputs across forms (SPEC §8.5 radius md). */
 export const fieldCls =
-  "w-full rounded-md border border-border bg-bg-subtle px-3 py-2 text-sm text-text placeholder:text-text-subtle transition-colors hover:border-border-strong focus:border-brand-500 focus:outline-none";
+  "w-full rounded-md border border-border bg-bg-subtle px-3 py-2 text-sm text-text placeholder:text-text-subtle transition-colors hover:border-border-strong focus:border-brand-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 type ButtonProps = {
   href?: string;

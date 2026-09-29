@@ -30,7 +30,7 @@ export default async function MyProjects(): Promise<React.JSX.Element> {
             <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-bg-subtle">
               <span className="min-w-0 truncate">{p.title} <Badge><span className={STATUS_TONE[p.status] ?? ""}>{p.status}</span></Badge></span>
               <span className="flex shrink-0 gap-3 text-sm">
-                <a className="text-text-muted hover:text-text" href={`/p/${p.slug}`}>View</a>
+                {p.status === "approved" && <a className="text-text-muted hover:text-text" href={`/p/${p.slug}`}>View</a>}
                 <a className="underline underline-offset-4" href={`/dashboard/projects/${p.id}/edit`}>Edit</a>
               </span>
             </li>

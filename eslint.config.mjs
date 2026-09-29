@@ -1,13 +1,11 @@
-import nextPlugin from "@next/eslint-plugin-next";
+import vitals from "eslint-config-next/core-web-vitals";
+import ts from "eslint-config-next/typescript";
 
 /** Flat config (Next 16 removed `next lint`; run via `pnpm lint` → `eslint .`). */
-export default [
+const config = [
   { ignores: ["node_modules/**", ".next/**", "supabase/functions/**"] },
-  {
-    plugins: { "@next/next": nextPlugin },
-    rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs["core-web-vitals"].rules,
-    },
-  },
+  ...vitals,
+  ...ts,
 ];
+
+export default config;

@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+
+function subscribe(): () => void {
+  return () => undefined;
+}
 
 /**
  * Scroll-reveal wrapper (transform + opacity only; static under reduced motion).
- * Renders a plain div on the server and first client paint so SSR HTML always
- * matches hydration (matchMedia doesn't exist server-side). Motion upgrades
- * after mount.
+ * Mount state comes from useSyncExternalStore so SSR HTML (server snapshot)
+ * always matches hydration — matchMedia doesn't exist server-side.
  */
 export function Reveal({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }): React.JSX.Element {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
   const reduce = useReducedMotion();
   if (!mounted || reduce) return <div className={className}>{children}</div>;
   return (

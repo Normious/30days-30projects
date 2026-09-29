@@ -43,9 +43,9 @@ export default async function Home(): Promise<React.JSX.Element> {
             </div>
             <dl className="mt-10 flex gap-8">
               {[[String(projects ?? 0), "projects"], [String(makers ?? 0), "makers"]].map(([v, l]) => (
-                <div key={l}>
+                <div key={l} className="flex flex-col">
+                  <dd className="order-1 font-mono text-2xl tabular-nums">{v}</dd>
                   <dt className="order-2 mt-1 text-sm text-text-subtle">{l}</dt>
-                  <dd className="font-mono text-2xl tabular-nums">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -81,7 +81,7 @@ export default async function Home(): Promise<React.JSX.Element> {
         </div>
         {(featured ?? []).length === 0 && (
           <p className="mt-6 rounded-md border border-dashed border-border-strong px-6 py-12 text-center text-sm text-text-subtle">
-            No featured projects yet — curate up to 5 from <Link className="underline" href="/admin/projects">moderation</Link>.
+            No featured projects yet.
           </p>
         )}
       </section>

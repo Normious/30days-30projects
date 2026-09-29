@@ -50,6 +50,8 @@ export function NavLinks({ role }: { role: PlatformRole | null }): React.JSX.Ele
             {authed ? (
               <>
                 <Link href="/dashboard" onClick={() => setOpen(false)}>Dashboard</Link>
+                {(role === "organiser" || role === "admin") && <Link href="/organiser" onClick={() => setOpen(false)}>Organise</Link>}
+                {role === "admin" && <Link href="/admin" onClick={() => setOpen(false)}>Admin</Link>}
                 <SignOutButton />
               </>
             ) : (

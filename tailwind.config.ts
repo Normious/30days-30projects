@@ -20,6 +20,7 @@ const config: Config = {
       },
     },
   },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- tailwindcss-animate ships no types; CJS require keeps `pnpm typecheck` green
   plugins: [require("tailwindcss-animate")],
 };
 

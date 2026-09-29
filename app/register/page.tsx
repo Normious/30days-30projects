@@ -18,7 +18,7 @@ export default function Register(): React.JSX.Element {
   return (
     <div className="mx-auto max-w-md px-4 py-16 md:py-24">
       <h1 className="text-3xl font-semibold tracking-tight">Join the challenge</h1>
-      <p className="mt-2 text-sm text-text-muted">One email, one portfolio. Register with a magic link, Google, or GitHub.</p>
+      <p className="mt-2 text-sm text-text-muted">One email, one portfolio. Register with an email magic link.</p>
       {sent ? <p className="mt-6 rounded-md border border-border bg-bg-subtle p-4 text-sm">Check your email to complete registration.</p> : (
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>

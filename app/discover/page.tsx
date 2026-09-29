@@ -15,7 +15,7 @@ export default async function Discover({ searchParams }: Props): Promise<React.J
   if (sp.tech) query = query.contains("tech_stack", [sp.tech]);
   const { data, count } = await query;
   const projects = (data ?? []) as never[];
-  const filtering = Boolean(sp.q ?? sp.tech ?? sp.category);
+  const filtering = Boolean(sp.q || sp.tech || sp.category);
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
       <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Discover</h1>
